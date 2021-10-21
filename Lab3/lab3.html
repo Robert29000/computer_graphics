@@ -1,0 +1,86 @@
+<HTML>
+    <BODY>
+    <canvas id="lab03" width="500" height="400">
+    </canvas>
+    <script>
+
+            function Line(idata, x0, y0, x1, y1) {
+                // check the angle
+                var steep = Math.abs(y1 - y0) > Math.abs(x1 - x0) 
+                if (steep) {
+                    var temp = x0
+                    x0 = y0
+                    y0 = temp
+
+                    temp = x1
+                    x1 = y1
+                    y1 = temp
+                }
+                // line not from left to right
+                if (x0 > x1) {
+                    var temp = x0
+                    x0 = x1
+                    x1 = temp
+
+                    temp = y0
+                    y0 = y1
+                    y1 = temp
+                }
+                var dx = x1 - x0;
+                var dy = Math.abs(y1 - y0);
+                var error = dx / 2;
+                // direction of y
+                var ystep = (y0 < y1) ? 1 : -1;
+                var y = y0;
+                
+                for (var x = x0; x <= x1; x++) {
+                    // check for swap
+                    if (steep) {
+                        idata.data[(y+x*idata.width)*4] = 255
+                        idata.data[(y+x*idata.width)*4 + 1] = 0
+                        idata.data[(y+x*idata.width)*4 + 2] = 0
+                        idata.data[(y+x*idata.width)*4 + 3] = 255
+                    } else {
+                        idata.data[(x+y*idata.width)*4] = 255
+                        idata.data[(x+y*idata.width)*4 + 1] = 0
+                        idata.data[(x+y*idata.width)*4 + 2] = 0
+                        idata.data[(x+y*idata.width)*4 + 3] = 255
+                    }
+                    
+                    error -= dy;
+                    if (error < 0) {
+                        y += ystep;
+                        error += dx;
+                    }
+                }
+    
+            }
+    </script>
+    <script>
+            var canvas = document.getElementById("lab03");
+            var ctx = canvas.getContext("2d");
+    
+            var flag = 0;
+            x0 = 0;
+            y0 = 0;
+            x1 = 0;
+            y1 = 0;
+            var idata = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            console.log(idata);
+            canvas.addEventListener("click", function(event){
+                            if (!flag) {
+                                    x0 = event.offsetX;
+                                    y0 = event.offsetY;
+                                    flag = 1;
+                            } else {
+                                    x1 = event.offsetX;
+                                    y1 = event.offsetY;
+                                    Line(idata, x0, y0, x1, y1);
+                                    ctx.putImageData(idata, 0, 0);
+                                    flag = 0;
+                            }
+                    });
+    
+    </script>
+    </BODY>
+    </HTML>

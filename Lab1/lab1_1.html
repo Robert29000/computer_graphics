@@ -1,0 +1,48 @@
+<HTML>
+    <BODY>
+    <canvas id='lab01' width='400' height='300' style="border:1px solid">
+    </canvas>
+    <script>
+        var canvas = document.getElementById('lab01');
+        var ctx = canvas.getContext('2d');
+    
+        var i = 0;
+        var change = 0;
+        var direction = 1;
+        var smile = true;
+
+        document.addEventListener("keydown", function(event) {
+                if (event.code == "ArrowRight") {
+                    direction = 1;
+                } else if (event.code == "ArrowLeft") {
+                    direction = -1;
+                } else if (event.code == "ArrowUp") {
+                    smile = true;
+                    change = 0;
+                } else if (event.code == "ArrowDown") {
+                    smile = false;
+                    change = 20;
+                }
+            });
+    
+        setInterval( function () {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.beginPath();
+                ctx.arc(50 + i, 150, 50, 0, Math.PI * 2, true);
+                ctx.moveTo(70 + i, 150 + change);  // координата центра начала рта плюс его радиус, край рта. 
+                ctx.arc(50 + i, 150 + change, 20, 0, Math.PI, !smile);
+                ctx.moveTo(40 + i, 140);
+                ctx.arc(35 + i, 140, 5, 0, Math.PI * 2, true);
+                ctx.moveTo(70 + i, 140);
+                ctx.arc(65 + i, 140, 5, 0, Math.PI * 2, true);
+                ctx.fillStyle = "#ffff00";
+                ctx.fill();
+                ctx.stroke();
+
+                i += direction; 
+            }, 10);
+    
+    </script>
+    </BODY>
+    </HTML>
