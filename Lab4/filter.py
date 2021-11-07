@@ -3,19 +3,9 @@ from PIL import Image
 import numpy as np
 
 
-def get_median(window):
-    r_sum = 0
-    g_sum = 0
-    b_sum = 0
-    for i in range(len(window)):
-        r_sum += window[i][0]
-        g_sum += window[i][1]
-        b_sum += window[i][2]
-    return [r_sum / 9, g_sum / 9, b_sum / 9]
-
-
 def filter(image_path_in, image_path_out):
-    image = Image.open(image_path_in).convert('RGB')
+    image = Image.open(image_path_in).convert('L')
+    image.save(image_path_out + "gray.jpg")
     data = np.array(image)
     
     # make borders
@@ -50,25 +40,27 @@ def filter(image_path_in, image_path_out):
     
     for y in range(height):
         for x in range(width):
-            window = [ None for _ in range(9) ]
             if x > 0 and y > 0 and x < width - 1 and y < height - 1:
-                window[0] = data_bordered[y - 1][x - 1]
-                window[1] = data_bordered[y - 1][x]
-                window[2] = data_bordered[y - 1][x + 1]
+                z1 = data_bordered[y - 1][x - 1]
+                z2 = data_bordered[y - 1][x]
+                z3 = data_bordered[y - 1][x + 1]
 
-                window[3] = data_bordered[y][x - 1]
-                window[4] = data_bordered[y][x]
-                window[5] = data_bordered[y][x + 1]
+                z4 = data_bordered[y][x - 1]
+                z5 = data_bordered[y][x]
+                z6 = data_bordered[y][x + 1]
 
-                window[6] = data_bordered[y + 1][x - 1]
-                window[7] = data_bordered[y + 1][x]
-                window[8] = data_bordered[y + 1][x + 1]
+                z7 = data_bordered[y + 1][x - 1]
+                z8 = data_bordered[y + 1][x]
+                z9 = data_bordered[y + 1][x + 1]
 
-                data_filtered[y - 1][x - 1] = get_median(window)            
+                Gx = z7 + 2*z8 + z9 - (z1 + 2*z2 + z3)
+                Gy = z3 + 2*z6 + z9 - (z1 + 2*z4 + z7)
+                # Multiply by 255 to better show borders
+                data_filtered[y - 1][x - 1] = np.sqrt(np.power(Gx, 2) + np.power(Gy, 2))           
     
     new_image = Image.fromarray(data_filtered)
-    new_image.save(image_path_out)
-    print("MEDIAN FILTERING IS DONE!")
+    new_image.save(image_path_out + "filtered.jpg")
+    print("SOBOL FILTERING IS DONE!")
     print("CHECK THE RESULT!")
 
 
